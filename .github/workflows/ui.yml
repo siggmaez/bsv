@@ -39,6 +39,7 @@ jobs:
             adb shell wm size ${{ matrix.size }}
             adb shell wm density 320
             ./gradlew :app:connectedDebugAndroidTest
+            adb install -r app/build/outputs/apk/debug/app-debug.apk
             adb shell am start -n dev.bsv.visuals/dev.bsv.app.MainActivity
             sleep 3
             adb shell screencap -p /sdcard/bsv.png
