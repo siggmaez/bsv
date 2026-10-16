@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dev.bsv.settings.Settings
@@ -23,14 +24,15 @@ class BrandingTest {
 
     @After
     fun releaseControlledFramesBeforeActivityClose() {
-        // On API 26 a closing window can wait for a frame from the test-controlled
-        // Compose clock. Remove animated content before ActivityScenario closes it.
-        // The rule still verifies the full transition to DESTROYED.
+        // Stop the test window explicitly before closing it on legacy Android.
+        // ActivityScenario maps CREATED to onStop and still verifies DESTROYED
+        // during rule cleanup; no lifecycle assertion is skipped.
         compose.runOnIdle {
             compose.activity.window.setWindowAnimations(0)
             compose.activity.setContent {}
         }
         compose.waitForIdle()
+        compose.activityRule.scenario.moveToState(Lifecycle.State.CREATED)
     }
 
     @Test
