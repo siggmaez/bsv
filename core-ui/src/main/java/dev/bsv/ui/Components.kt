@@ -117,6 +117,11 @@ fun BsvTheme(s: Settings, content: @Composable () -> Unit) {
                 onBackground = Color.White,
                 onSurfaceVariant = Color(0xFF9898AA),
             ),
-        content = content,
+        content = {
+            CompositionLocalProvider(
+                LocalContentColor provides MaterialTheme.colorScheme.onBackground,
+                content = content,
+            )
+        },
     )
 }
