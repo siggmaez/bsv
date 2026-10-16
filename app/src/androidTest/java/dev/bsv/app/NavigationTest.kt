@@ -1,9 +1,11 @@
 package dev.bsv.app
 
 import android.content.res.Configuration
+import androidx.activity.compose.setContent
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -13,6 +15,18 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class NavigationTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
+
+    @After
+    fun releaseControlledFramesBeforeActivityClose() {
+        // On API 26 a closing window can wait for a frame from the test-controlled
+        // Compose clock. Remove animated content before ActivityScenario closes it.
+        // The rule still verifies the full transition to DESTROYED.
+        compose.runOnIdle {
+            compose.activity.window.setWindowAnimations(0)
+            compose.activity.setContent {}
+        }
+        compose.waitForIdle()
+    }
 
     @Test
     fun allTabsAndFloatingMenuSurviveRapidNavigation() {

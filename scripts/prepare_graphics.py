@@ -42,6 +42,12 @@ for density, scale in [('mdpi',1),('hdpi',1.5),('xhdpi',2),('xxhdpi',3),('xxxhdp
     directory.mkdir(parents=True,exist_ok=True)
     size=round(108*scale)
     foreground=mark(Image.new('RGBA',(size,size)),round(60*scale))
+    # Keep visible artwork inside Android's central 66dp safe circle.
+    alpha = foreground.getchannel('A')
+    center = size / 2
+    radius = size * 33 / 108
+    assert all(alpha.getpixel((x,y)) <= 16 or (x-center)**2 + (y-center)**2 <= radius**2
+               for y in range(size) for x in range(size)), 'Adaptive icon exceeds safe zone'
     foreground.save(directory/'ic_launcher_foreground.png',optimize=True)
     icon=mark(background(round(48*scale)),round(39*scale))
     icon.save(directory/'ic_launcher.png',optimize=True)
