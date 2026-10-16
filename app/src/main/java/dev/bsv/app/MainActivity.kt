@@ -45,6 +45,18 @@ class MainActivity : ComponentActivity() {
 fun BsvApp(vm: BsvViewModel = viewModel()) {
     val s by vm.settings.collectAsStateWithLifecycle()
     val status by vm.status.collectAsStateWithLifecycle()
+    val ready by vm.ready.collectAsStateWithLifecycle()
+    if (!ready) {
+        BsvTheme(s) {
+            Box(
+                Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+                contentAlignment = Alignment.Center,
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+        return
+    }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var tab by rememberSaveableState(0)

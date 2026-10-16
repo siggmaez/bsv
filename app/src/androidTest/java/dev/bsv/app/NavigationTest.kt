@@ -13,6 +13,9 @@ class NavigationTest {
 
     @Test
     fun allTabsAndFloatingMenuSurviveRapidNavigation() {
+        compose.waitUntil(timeoutMillis = 10_000) {
+            compose.onAllNodesWithTag("nav-0").fetchSemanticsNodes().isNotEmpty()
+        }
         compose.waitForIdle()
         repeat(3) {
             for (i in 0..4) {

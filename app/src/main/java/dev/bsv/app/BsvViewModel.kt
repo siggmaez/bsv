@@ -15,17 +15,17 @@ class BsvViewModel(app: Application) : AndroidViewModel(app) {
     val settings = _settings.asStateFlow()
     private val _status = MutableStateFlow("")
     val status = _status.asStateFlow()
-    var ready = false
-        private set
+    private val _ready = MutableStateFlow(false)
+    val ready = _ready.asStateFlow()
 
     init {
         viewModelScope.launch {
             try {
                 _settings.value = repo.settings.first()
-                ready = true
+                _ready.value = true
             } catch (e: Exception) {
                 _status.value = "Storage read error: ${e.message}"
-                ready = true
+                _ready.value = true
             }
             for (value in pending) try {
                 repo.save(value)
@@ -37,12 +37,13 @@ class BsvViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun update(s: Settings) {
-        if (!ready) return
+        if (!_ready.value) return
         _settings.value = s.normalized()
         pending.trySend(_settings.value)
     }
 
     fun save() {
+        if (!_ready.value) return
         pending.trySend(_settings.value)
     }
 

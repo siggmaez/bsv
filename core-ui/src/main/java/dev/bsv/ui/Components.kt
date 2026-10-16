@@ -40,6 +40,7 @@ fun Panel(title: String, subtitle: String? = null, content: @Composable ColumnSc
 fun Page(content: @Composable ColumnScope.() -> Unit) {
     Column(
         Modifier.fillMaxSize()
+            .imePadding()
             .verticalScroll(rememberScrollState())
             .padding(20.dp)
             .padding(bottom = 70.dp),
