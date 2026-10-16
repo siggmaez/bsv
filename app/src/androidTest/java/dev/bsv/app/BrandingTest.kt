@@ -1,7 +1,6 @@
 package dev.bsv.app
 
 import android.graphics.drawable.AdaptiveIconDrawable
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.width
 import androidx.compose.ui.Modifier
@@ -20,7 +19,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class BrandingTest {
-    @get:Rule val compose = createAndroidComposeRule<ComponentActivity>()
+    @get:Rule val compose = createAndroidComposeRule<MainActivity>()
 
     @After
     fun releaseControlledFramesBeforeActivityClose() {
@@ -36,7 +35,9 @@ class BrandingTest {
 
     @Test
     fun realLoadingComponentShowsBrandAndVersion() {
-        compose.setContent { BsvTheme(Settings()) { BsvSplash(animations = false) } }
+        compose.activityRule.scenario.onActivity { activity ->
+            activity.setContent { BsvTheme(Settings()) { BsvSplash(animations = false) } }
+        }
         compose.onNodeWithTag("bsv-splash").assertIsDisplayed()
         compose.onNodeWithTag("brand-logo").assertIsDisplayed()
         compose.onNodeWithTag("loading-indicator").assertIsDisplayed()
@@ -46,7 +47,9 @@ class BrandingTest {
 
     @Test
     fun bannerPreservesWidescreenAspectRatio() {
-        compose.setContent { BsvTheme(Settings()) { BrandBanner(Modifier.width(400.dp)) } }
+        compose.activityRule.scenario.onActivity { activity ->
+            activity.setContent { BsvTheme(Settings()) { BrandBanner(Modifier.width(400.dp)) } }
+        }
         val bounds = compose.onNodeWithTag("brand-banner").getUnclippedBoundsInRoot()
         assertEquals(
             16f / 9f,
