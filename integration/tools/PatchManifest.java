@@ -8,6 +8,7 @@ import com.reandroid.archive.ByteInputSource;
 /** Edits Android metadata only. Native libraries and original DEX stay untouched. */
 public class PatchManifest {
     public static void main(String[] args) throws Exception {
+        if (args.length != 3) throw new IllegalArgumentException("input.apk output.apk menu.dex (or - for packaging control)");
         try (ApkModule module = ApkModule.loadApkFile(new File(args[0]))) {
             AndroidManifestBlock manifest = module.getAndroidManifestBlock();
             String oldPackage = manifest.getPackageName();
@@ -29,21 +30,27 @@ public class PatchManifest {
                 }
             }
             manifest.setPackageName(newPackage);
-            manifest.setApplicationLabel("BSV • Brawl Stars");
+            boolean base = module.getInputSource("classes.dex") != null;
+            boolean inject = base && !args[2].equals("-");
+            if (base) manifest.setApplicationLabel("BSV • Brawl Stars");
             ResXmlElement app = manifest.getApplicationElement();
             for (ResXmlElement activity : app.listElements("activity")) {
                     ResXmlAttribute name = activity.searchAttributeByName("name");
                     if (name != null && name.getValueAsString().equals("com.supercell.brawlstars.GameApp"))
                         activity.getOrCreateAndroidAttribute("label", 0x01010001).setValueAsString("BSV • Brawl Stars");
             }
-            ResXmlElement provider = app.newElement("provider");
-            provider.getOrCreateAndroidAttribute("name", 0x01010003).setValueAsString("dev.bsv.integration.BsvProvider");
-            provider.getOrCreateAndroidAttribute("authorities", 0x01010018).setValueAsString(newPackage + ".bsv.init");
-            provider.getOrCreateAndroidAttribute("exported", 0x01010010).setValueAsBoolean(false);
+            if (inject) {
+                ResXmlElement provider = app.newElement("provider");
+                provider.getOrCreateAndroidAttribute("name", 0x01010003).setValueAsString("dev.bsv.integration.BsvProvider");
+                provider.getOrCreateAndroidAttribute("authorities", 0x01010018).setValueAsString(newPackage + ".bsv.init");
+                provider.getOrCreateAndroidAttribute("exported", 0x01010010).setValueAsBoolean(false);
+            }
             manifest.refresh();
-            int dexIndex = 2;
-            while (module.getInputSource("classes" + dexIndex + ".dex") != null) dexIndex++;
-            module.add(new ByteInputSource(Files.readAllBytes(Paths.get(args[2])), "classes" + dexIndex + ".dex"));
+            if (inject) {
+                int dexIndex = 2;
+                while (module.getInputSource("classes" + dexIndex + ".dex") != null) dexIndex++;
+                module.add(new ByteInputSource(Files.readAllBytes(Paths.get(args[2])), "classes" + dexIndex + ".dex"));
+            }
             module.writeApk(new File(args[1]));
         }
     }
