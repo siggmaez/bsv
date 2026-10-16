@@ -13,6 +13,7 @@ android {
 }
 kotlin { jvmToolchain(21); compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17) } }
 dependencies {
+ implementation("androidx.core:core-splashscreen:1.0.1")
  androidTestImplementation(platform("androidx.compose:compose-bom:2025.03.01"))
  androidTestImplementation("androidx.compose.ui:ui-test-junit4")
  androidTestImplementation("androidx.test:runner:1.6.2")

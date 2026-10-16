@@ -103,7 +103,7 @@ fun BsvTheme(s: Settings, content: @Composable () -> Unit) {
         when (s.theme) {
             "AMOLED" -> Color.Black
             "Slate" -> Color(0xFF17202E)
-            else -> Color(0xFF101014)
+            else -> BsvBrand.Background
         }
     MaterialTheme(
         colorScheme =
@@ -111,7 +111,7 @@ fun BsvTheme(s: Settings, content: @Composable () -> Unit) {
                 primary = accent,
                 secondary = Color(0xFF6366F1),
                 background = bg,
-                surface = Color(0xFF191920),
+                surface = BsvBrand.Surface,
                 surfaceVariant = Color(0xFF23232D),
                 onSurface = Color.White,
                 onBackground = Color.White,

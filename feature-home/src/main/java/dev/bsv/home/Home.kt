@@ -9,7 +9,8 @@ import dev.bsv.ui.*
 
 @Composable
 fun Home(s: Settings, reset: () -> Unit) = Page {
-    Panel("BSV", s.tr("YOUR LOOK. YOUR RULES.", "ТВОЙ СТИЛЬ. ТВОИ ПРАВИЛА.")) {
+    BrandBanner()
+    Panel("BSV", s.tr("More Visuals. More Fun.", "More Visuals. More Fun.")) {
         Text("Brawl Stars Visuals", style = MaterialTheme.typography.headlineMedium)
         Text("Version 0.1.0 | Android", color = MaterialTheme.colorScheme.primary)
         Text(

@@ -21,6 +21,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.*
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.*
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.bsv.appearance.Appearance
@@ -36,6 +37,7 @@ import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         setContent { BsvApp() }
     }
@@ -47,14 +49,7 @@ fun BsvApp(vm: BsvViewModel = viewModel()) {
     val status by vm.status.collectAsStateWithLifecycle()
     val ready by vm.ready.collectAsStateWithLifecycle()
     if (!ready) {
-        BsvTheme(s) {
-            Box(
-                Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
-                contentAlignment = Alignment.Center,
-            ) {
-                CircularProgressIndicator()
-            }
-        }
+        BsvTheme(s) { BsvSplash(s.animations) }
         return
     }
     val context = LocalContext.current
@@ -143,27 +138,7 @@ fun BsvApp(vm: BsvViewModel = viewModel()) {
                                 MaterialTheme.colorScheme.background.copy(alpha = s.opacity)
                             )
                     ) {
-                        Row(
-                            Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 12.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                        ) {
-                            Column {
-                                Text(
-                                    "BSV — Brawl Stars Visuals",
-                                    style = MaterialTheme.typography.titleLarge,
-                                )
-                                Text(
-                                    "Version 0.1.0 | Android",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                            Text(
-                                "● " + s.tr("LOCAL PREVIEW", "ЛОКАЛЬНО"),
-                                color = MaterialTheme.colorScheme.primary,
-                                style = MaterialTheme.typography.labelSmall,
-                            )
-                        }
+                        BrandHeader(s)
                         HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
                         Row(Modifier.weight(1f)) {
                             Column(
